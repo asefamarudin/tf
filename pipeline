@@ -1,0 +1,24 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Build') {
+      steps {
+        sh 'make build'
+      }
+    }
+    stage('Unit Test') {
+      steps {
+        sh 'make test'
+      }
+    }
+    stage('Deploy') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: 'docker-hub', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+          sh 'make push'
+        }
+        sh 'terraform apply'
+      }
+    }
+  }
+}
